@@ -17,9 +17,6 @@ DPE = ["A", "B", "C", "D", "E", "F"]
 task_status = {}
 task_message = {}
 
-
-<<<<<<< HEAD
-
 def query_reno_bot(session_key, data):
             
     request1 = (
@@ -33,18 +30,6 @@ def query_reno_bot(session_key, data):
     )
     print(data)
 
-=======
-def query_reno_bot(session_key, data):
-            
-    request1 = (
-        "Identifier les économies d'énergie et comment passer de la classe_dpe " 
-        + data.get("dpe") + " à " + data.get("dpe_objectif") + " avec économie d'énergie pour mon bien : " 
-        + data.get("property_type") + " de " +  str(data.get("surface")) + " mètres carrés dans le département " 
-        + data.get("department") + ". Elaborer une réponse avec les options d'aides financières disponibles."
-    )
-    print(data)
-
->>>>>>> b0669db2fe0782ab2c160c101e244f33088cbea9
     # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request1)
     generated_response_string = """ Pour identifier les économies d'énergie et passer de la classe DPE D à C pour votre appartement de 50 mètres carrés dans le département 76, vous pouvez envisager les mesures suivantes :
 
@@ -86,26 +71,18 @@ def init_chat():
     dpe = request.form['dpe']
     department = request.form['department']
     property_type = request.form['property_type']
-<<<<<<< HEAD
     energy_type = request.form['energy_type']
     build_year = request.form['build_year']
     glazing_type = request.form['glazing_type']
-=======
-    #energy_type = request.form['energy_type']
->>>>>>> b0669db2fe0782ab2c160c101e244f33088cbea9
     dpe_objectif = DPE[DPE.index(dpe) - 1]
     data = {
         "surface": surface,
         "dpe": dpe,
         "department": department,
         "property_type": property_type,
-<<<<<<< HEAD
         "energy_type": energy_type,
         "build_year": build_year,
         "glazing_type": glazing_type,
-=======
-        #"energy_type": energy_type,
->>>>>>> b0669db2fe0782ab2c160c101e244f33088cbea9
         "dpe_objectif": dpe_objectif,
     }
     print(data)
