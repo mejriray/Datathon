@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, jsonify
+from flask import Flask, render_template, session, redirect, url_for, jsonify, request
 from flask_socketio import SocketIO, emit
 import threading
 # from fct import fcts
@@ -8,20 +8,24 @@ app.config['SECRET_KEY'] = 'your_secret_key' # For session management
 socketio = SocketIO(app)
 
 # QUERY_ENGINE = fcts.init_server() # Init server bot backend
+DPE = ["A", "B", "C", "D", "E", "F"]
 
 # In-memory task completion flag and message - in production, use a database or cache
 task_status = {}
 task_message = {}
 
 
-def query_reno_bot(session_key):
-        request = (
-            "Identifier les économies d'énergie et comment passer de la classe_dpe D à C"
-            + " avec économie d'énergie pour mon appartement de 50 mètres carrés"
-            + " dans le département 76. Elaborer une réponse avec les options d'aides financières disponibles."
-        )
+def query_reno_bot(session_key, data):
+        print(data)
+               
+        request1 = (
+            "Identifier les économies d'énergie et comment passer de la classe_dpe " 
+            + data.dpe + " à " + data.dpe_objectif + " avec économie d'énergie pour mon bien : " 
+            + data.property_type + " de " +  data.surface + " mètres carrés dans le département " 
+            + data.department + ". Elaborer une réponse avec les options d'aides financières disponibles."
+    )
 
-        # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request)
+        # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request1)
         generated_response_string = """ Pour identifier les économies d'énergie et passer de la classe DPE D à C pour votre appartement de 50 mètres carrés dans le département 76, vous pouvez envisager les mesures suivantes :
 
 1. Isolation : Assurez-vous que votre appartement est bien isolé, en particulier les murs, les fenêtres et le toit. Cela permettra de réduire les pertes de chaleur et de diminuer votre consommation d'énergie.
@@ -56,12 +60,29 @@ def index():
 
 @app.route("/init_chat", methods=['POST'])
 def init_chat():
+    surface = int(request.form['surface'])
+    dpe = request.form['dpe']
+    department = request.form['department']
+    postal_code = request.form['postal_code']
+    property_type = request.form['property_type']
+    energy_type = request.form['energy_type']
+    dpe_objectif = DPE[DPE.index(dpe) - 1]
+    data = {
+        "surface": surface,
+        "dpe": dpe,
+        "department": department,
+        "postal_code": postal_code,
+        "property_type": property_type,
+        "energy_type": energy_type,
+        "dpe_objectif": dpe_objectif,
+    }
+    print (data)
     session_key = 'task_done'  # Unique session key for task status
     session[session_key] = False
     task_status[session_key] = False
     task_message[session_key] = ""
     # Start long-running task in a separate thread
-    threading.Thread(target=query_reno_bot, args=(session_key,)).start()
+    threading.Thread(target=query_reno_bot, args=(session_key, data)).start()
     return redirect(url_for('loading'))
 
 
