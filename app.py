@@ -2,13 +2,18 @@ from flask import Flask, render_template, session, redirect, url_for, jsonify, r
 from flask_socketio import SocketIO, emit
 import threading
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 import textwrap
 # from fct import fcts
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' # For session management
 socketio = SocketIO(app)
+df = pd.read_parquet("dfs/database_dpe.parquet")
+fig_surface = px.histogram(df, x='surface_habitable_logement', nbins=50, title='Distribution de la surface habitable')
+# Convert the Plotly figure to HTML
+plot_div = fig_surface.to_html(full_html=False)
+
 
 # QUERY_ENGINE = fcts.init_server() # Init server bot backend
 DPE = ["A", "B", "C", "D", "E", "F"]
@@ -116,7 +121,8 @@ def renovaide_chat():
     initial_message = task_message.get(session_key, "")
     initial_message = initial_message.strip().replace("\n", "<br>")
     print("INITIAL MESSAGE:\n",initial_message)
-    return render_template('chat.html', initial_message=initial_message)
+    
+    return render_template('chat.html', initial_message=initial_message, plot_div=plot_div)
 
 
 @socketio.on('user_input')
