@@ -1,0 +1,159 @@
+<!-- templates/renovaide_chat.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RenovAIde</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+    <style type="text/css">
+        .fixed-panel {
+            min-height: 400px;
+            max-height: 1600px;
+            background-color: #19313c;
+            color: white;
+            overflow: auto;
+        }
+    
+        .media-list {
+            overflow: auto;
+            clear: both;
+            display: table;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: normal;
+            line-break: strict;
+        }
+    
+        .panel {
+            margin-bottom: 20px;
+            background-color: #fff;
+            border: 6px solid transparent;
+            border-radius: 25px;
+            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+        }
+    
+        .panel-info {
+            border-color: #0c2735;
+        }
+    
+        .panel-info>.panel-heading {
+            color: white;
+            background-color: #0c2735;
+            border-color: #0c2735;
+        }
+    
+        .panel-footer {
+            padding: 10px 15px;
+            background-color: #0c2735;
+            border-top: 1px solid #0c2735;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px
+        }
+    
+        body {
+            background: rgb(96, 143, 149);
+            /* Old browsers */
+            background: -moz-linear-gradient(-45deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
+            /* FF3.6-15 */
+            background: -webkit-linear-gradient(-45deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
+            /* Chrome10-25,Safari5.1-6 */
+            background: linear-gradient(135deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
+            /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#608f95', endColorstr='#1a1e3b', GradientType=1);
+            /* IE6-9 fallback on horizontal gradient */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container background-color: rgb(255,20,255);">
+        <div class="row">
+            <h3 class="text-center"><small><strong>Renov</strong></small>
+                <font color="white">AI</font><small><strong> de</strong></small>
+            </h3>
+            <div class="col-md-4 col-md-offset-4">
+                <div id="chatPanel" class="panel panel-info">
+                    <div class="panel-heading">
+                        <strong><span class="glyphicon glyphicon-leaf"></span></strong>
+                    </div>
+                    <div class="panel-body fixed-panel">
+                        <ul class="messages" id="messages">
+                        </ul>
+                    </div>
+                    <div class="panel-footer">
+                        <form method="post" id="chatbot-form">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter Message" name="messageText"
+                                    id="messageText" autofocus />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info" type="button" id="chatbot-form-btn" onclick="sendMessage()">Send</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        // Correctly initialize the Socket.IO client
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function () {
+            // Emit a message upon connection
+            socket.emit('my event', { data: 'User has connected!' });
+
+            // Display the initial message if there is one
+            var initialMessage = "{{ initial_message|safe }}";
+            if (initialMessage) {
+                addMessage("Bot", initialMessage, true);
+            }
+        });
+
+        //$(document).ready(function () {
+        //    // If there's an initial message, show it.
+        //    var initialMessage = "{{ initial_message }}";
+        //    if (initialMessage) {
+        //        addMessage("Bot", initialMessage);
+        //    }
+        //});
+
+        socket.on('bot_message', function (msg) {
+            // Append the bot's message to the message list.
+            addMessage("Bot", msg);
+        });
+
+        function sendMessage() {
+            var messageText = $('#message').val();
+            addMessage("You", messageText);
+            socket.emit('message', messageText);
+            $('#message').val('');
+            return false;
+        }
+
+        // Update the addMessage function to handle HTML content if needed
+        function addMessage(sender, message, isHtml) {
+            var messageElement = $('<li>');
+            if (sender) {
+                displayMessage = sender + ": " + message;
+            } else {
+                displayMessage = message
+            }
+            if (isHtml) {
+                var messageElement = $('<li>').html(displayMessage);
+            } else {
+                var messageElement = $('<li>').text(displayMessage);
+            }
+            $('#messages').append(messageElement);
+            console.log("messageElement");
+            console.log(messageElement);
+        }
+    </script>
+</body>
+
+</html>

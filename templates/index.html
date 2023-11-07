@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>RenovAIde</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Bienvenue dans RenovAIde</h1>
+    </header>
+
+
+    <nav>
+        <ul>
+            <li><a href="/">Root</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Page d'accueil</h2>
+        <p>Bienvenue sur notre application de rénovation énergétique.<br>Découvrez notre chatbot pour améliorer l'efficacité énergétique de votre logement.</p>
+        
+       <!-- ... -->
+<h3>Informations sur le logement</h3>
+<form id="renovationForm"  action="/init_chat" method="POST">
+    <label for="surface">Surface (m²)</label>
+    <input type="number" id="surface" name="surface" required><br>
+
+    <label for="dpe">Diagnostic de Performance Énergétique (DPE)</label>
+    <select id="dpe" name="dpe">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="G">G</option>
+    </select><br>
+
+    <label for="department">Département</label>
+    <select id="department" name="department">
+        <option value="76">Seine-Maritime : 76</option>
+        <option value="27">Eure : 27</option>
+        <option value="50">Manche : 50</option>
+        <option value="61">Orne : 61</option>
+        <option value="14">Calvados : 14</option>
+    </select>
+
+    <label for="postal_code">Code Postal</label>
+    <input type="text" id="postal_code" name="postal_code"><br>
+
+    <label for="property_type">Type de bien</label>
+    <select id="property_type" name="property_type">
+        <option value="Maison">Maison</option>
+        <option value="Appartement">Appartement</option>
+    </select><br>
+
+    <button type="submit">Calculer les recommandations de rénovation</button>
+    <!--<button type="button" id="saveData">Calculer les recommandations de rénovation</button> -->
+
+</form>
+<!-- ... -->
+        <h3>Recommandations de rénovation</h3>
+        <div id="recommendations">
+            Les recommandations du chatbot seront ici ^_^
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; Equipe Data Devolis SREHDD</p>
+    </footer>
+</body>
+</html>
