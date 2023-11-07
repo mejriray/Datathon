@@ -2,75 +2,117 @@
 <html>
 <head>
     <meta>
-    <title>RenovAIde</title>
+    <title>Renov'AIde</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <header>
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="100" height="70">
-    </header>
-
-    <main>
-        <h2>Page d'accueil</h2>
-        <p>Bienvenue sur notre application de rénovation énergétique.<br>Découvrez notre chatbot pour améliorer l'efficacité énergétique de votre logement.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Bienvenue sur Renov'<font color="yellow">AI</font>de</h2>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="100" height="70">
+        </div>
+    </div>
+    <div class="container panel-info background-color: rgb(255,20,255);">
+        <div class="row">
+            <div class="col-md-6" style="color:#fff">
+                <strong>
+                <p>Bienvenue sur notre application de rénovation énergétique.<br>
+                    Découvrez notre chatbot pour améliorer l'efficacité énergétique de votre logement.</p>
+                <p>Qu'est-ce que c'est RenovAIde ?</p>
+                <p>C'est une web application qui vous accompagne lors de la préparation de votre projet de rénovation énergétique. 
+                    Nous vous proposons deux fonctionalités principales : </p>
+                <ul>
+                    <li>Estimez votre consommation annuelle et les économies d'énergies que vont apporterons votre projet de rénovation ;</li>
+                    <li>Discutez directement avec notre Chatbot spécialisé dans les travaux de rénovations et la performance énergétique des logements.</li>
+                </ul>
+                </strong>
+            </div>
+            <div class="col-md-6">
+                <p style="color:#fff">Pour commencer, j'ai besoin de quelques informations sur votre logement</p>
+                <form id="renovationForm"  action="/init_chat" method="POST">
+                    <label for="property_type" style="color:#fff">Type de bien</label>
+                    <select id="property_type" name="property_type">
+                        <option value="Maison">Maison</option>
+                        <option value="Appartement">Appartement</option>
+                    </select><br>
+                    
+                    <label for="surface" style="color:#fff">Surface habitable (m²)</label>
+                    <input type="number" id="surface" name="surface" required><br>
+                    
+                    <label for="build_year" style="color:#fff">Année de construction</label>
+                    <select id="build_year" name="build_year">
+                        <option value="1900"> 1900 </option>
+                        <option value="1910"> 1910 </option>
+                        <option value="1920"> 1920 </option>
+                        <option value="1930"> 1930 </option>
+                        <option value="1940"> 1940 </option>
+                        <option value="1950"> 1950 </option>
+                        <option value="1960"> 1960 </option>
+                        <option value="1970"> 1970 </option>
+                        <option value="1980"> 1980 </option>
+                        <option value="1990"> 1990 </option>
+                        <option value="2000"> 2000 </option>
+                        <option value="2010"> 2010 </option>
+                        <option value="2020"> 2020 </option>
+                    </select><br>
         
-       <!-- ... -->
-<h3>Informations sur le logement</h3>
-<form id="renovationForm"  action="/init_chat" method="POST">
-    <label for="surface">Surface (m²)</label>
-    <input type="number" id="surface" name="surface" required><br>
-
-    <label for="dpe">Diagnostic de Performance Énergétique (DPE)</label>
-    <select id="dpe" name="dpe">
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="D">D</option>
-        <option value="E">E</option>
-        <option value="F">F</option>
-        <option value="G">G</option>
-    </select><br>
-
-    <label for="department">Département</label>
-    <select id="department" name="department">
-        <option value="76">Seine-Maritime : 76</option>
-        <option value="27">Eure : 27</option>
-        <option value="50">Manche : 50</option>
-        <option value="61">Orne : 61</option>
-        <option value="14">Calvados : 14</option>
-    </select>
-
-    <label for="property_type">Type de bien</label>
-    <select id="property_type" name="property_type">
-        <option value="Maison">Maison</option>
-        <option value="Appartement">Appartement</option>
-    </select><br>
-
-    <label for="build_year">Année de construction</label>
-    <input type="number" id="build_year" name="build_year" required><br>
-
-    <label for="energy_type">Type d'énergie</label>
-    <select id="energy_type" name="energy_type">
-        <option value="Elecrique">Elecrique</option>
-        <option value="Gaz">Gaz</option>
-        <option value="ElecriqueGaz">Electrique & Gaz</option>
-    </select><br>
-
-    <select id="glazing_type" name="glazing_type">
-        <option value="Simple">Simple vitrage</option>
-        <option value="Double">Double vitrage</option>
-        <option value="Triple">Triple vitrage</option>
-    </select><br>
-
-    <button type="submit">Calculer les recommandations de rénovation</button>
-    <!--<button type="button" id="saveData">Calculer les recommandations de rénovation</button> -->
-
-</form>
-<!-- ... -->
-    <footer>
-        <p style="text-align: left;">&copy; Equipe Data Devolis RenovAIde</p>
-        <img src="{{ url_for('static', filename='images/region_normandie.jpg') }}" alt="Région Normandie" width="75" height="35">
-        <img src="{{ url_for('static', filename='images/DataLab.jpg') }}" alt="DataLab" width="100" height="35">
-    </footer>
+                    <label for="dpe" style="color:#fff">Diagnostic de Performance Énergétique (DPE)</label>
+                    <select id="dpe" name="dpe">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="G">G</option>
+                    </select><br>
+                    
+                    <label for="department" style="color:#fff">Département</label>
+                    <select id="department" name="department">
+                        <option value="76">Seine-Maritime : 76</option>
+                        <option value="27">Eure : 27</option>
+                        <option value="50">Manche : 50</option>
+                        <option value="61">Orne : 61</option>
+                        <option value="14">Calvados : 14</option>
+                    </select>
+                    
+                    <label for="energy_type" style="color:#fff">Type d'énergie chauffage</label>
+                    <select id="energy_type" name="energy_type">
+                        <option value="gaz">Gaz</option>
+                        <option value="electricite">Electrique</option>
+                        <option value="fioul">Fioul</option>
+                        <option value="bois">Bois</option>
+                        <option value="reseau de chaleur">Réseau de chaleur</option>
+                        <option value="gpl/butane/propane">GPL/Butane/Propane</option>
+                    </select><br>
+                    
+                    <label for="glazing_type" style="color:#fff">Type vitrage</label>
+                    <select id="glazing_type" name="glazing_type">
+                        <option value="simple vitrage">Simple vitrage</option>
+                        <option value="double vitrage">Double vitrage</option>
+                        <option value="triple vitrage">Triple vitrage</option>
+                    </select><br>
+                    
+                    <button type="submit" style="color:#fff">Obtenir mes recommandations de rénovation</button>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row"  style="text-align: left;color:#fff">
+        <div class="col-md-8">
+            <p>&copy; Equipe Data Devolis RenovAIde</p>
+        </div>
+        <div class="col-md-8">
+            <img src="{{ url_for('static', filename='images/region_normandie.jpg') }}" alt="Région Normandie" width="75" height="35">
+        </div>
+        <div class="col-md-8">
+            <img src="{{ url_for('static', filename='images/DataLab.jpg') }}" alt="DataLab" width="100" height="35">
+        </div>
+    </div>
 </body>
 </html>

@@ -3,67 +3,62 @@ from flask_socketio import SocketIO, emit
 import threading
 import pandas as pd
 import plotly.express as px
-import textwrap
-# from fct import fcts
+from fct import fcts
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' # For session management
 socketio = SocketIO(app)
-df = pd.read_parquet("dfs/database_dpe.parquet")
-fig_surface = px.histogram(df, x='surface_habitable_logement', nbins=50, title='Distribution de la surface habitable')
-# Convert the Plotly figure to HTML
-plot_div = fig_surface.to_html(full_html=False)
 
-
-# QUERY_ENGINE = fcts.init_server() # Init server bot backend
-DPE = ["A", "B", "C", "D", "E", "F"]
+# Init server bot backend:
+# Llama-index query engine to prompt queries to a specialized ChatGPT
+# Database is a pandas dataframe containing average energy consumtions for housing in Normandie
+QUERY_ENGINE, DATABASE = fcts.init_server() 
 
 # In-memory task completion flag and message - in production, use a database or cache
 task_status = {}
 task_message = {}
 
+# TODO: move this to the right place
+# Convert the Plotly figure to HTML
+fig_surface = px.histogram(DATABASE, x='surface_habitable_logement', nbins=50, title='Distribution de la surface habitable')
+plot_div = fig_surface.to_html(full_html=False)
 
 def query_reno_bot(session_key, data):
-            
-    request1 = (
-        "Identifier les économies d'énergie et comment passer de la classe_dpe " + data.get("dpe") 
-        + " à " + data.get("dpe_objectif") + " avec économie d'énergie pour mon bien : " 
-        + data.get("property_type") + " de " +  str(data.get("surface")) + " mètres carrés" 
-        + " construit en " + str(data.get("build_year")) + " avec un vitrage de type : " 
-        + data.get("glazing_type") + " dans le département " 
-        + data.get("department") + " avec un type d'énergie : " + data.get("energy_type")
-        +". Elaborer une réponse avec les options d'aides financières disponibles."
+    user_request = (
+        """Tu es un conseiller expert en rénovation de logements.
+        Je possède un bien possédant les caractéristiques suivantes:
+        - type d'habitation: {}
+        - surface habitable: {} m²
+        - date de construction: {}
+        - vitrage: {}
+        - énergie chauffage: {}
+        - département: {}
+        - classe énergétique: {}
+        N'hésite pas à demander des complément d'informations si besoin.
+        Je souhaites que tu m'accompagnes dans le choix des meilleurs rénovations à effectuer pour réduire ma facture énergétique.
+        Dresse une liste des rénovations possibles suivant les premières informations que je t'ai fournit.
+        Dans un second temps liste les aides des financement disponibles et les conditions requises pour y avoir droit.
+        Enfin suggère moi de te demander des détails sur un type de rénovation.
+        """.format(
+            data.get("type_batiment_dpe"),
+            str(data.get("surface_habitable_logement")),
+            str(data.get("annee_construction_dpe")),
+            data.get("type_vitrage"),
+            data.get("type_energie_chauffage"),
+            data.get("code_departement_insee"),
+            data.get("classe_dpe")
+        )
     )
-    print(data)
+    
+    print("User request:")
+    print(user_request)
 
-    # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request1)
-    generated_response_string = """ Pour identifier les économies d'énergie et passer de la classe DPE D à C pour votre appartement de 50 mètres carrés dans le département 76, vous pouvez envisager les mesures suivantes :
+    generated_response_string = fcts.get_bot_response(QUERY_ENGINE, user_request)
+    print("generated_response_string:")
+    print(generated_response_string)
 
-1. Isolation : Assurez-vous que votre appartement est bien isolé, en particulier les murs, les fenêtres et le toit. Cela permettra de réduire les pertes de chaleur et de diminuer votre consommation d'énergie.
-
-2. Chauffage : Optez pour un système de chauffage plus efficace et économe en énergie, tel qu'une chaudière à granulés. Ce type de chauffage peut vous permettre de réaliser des économies significatives sur votre facture énergétique.
-
-3. Régulation de la température : Installez un thermostat programmable pour contrôler la température de votre appartement de manière plus précise et éviter les gaspillages d'énergie.       
-
-4. Éclairage : Remplacez les ampoules traditionnelles par des ampoules LED, qui consomment moins d'énergie et ont une durée de vie plus longue.
-
-5. Appareils électroménagers : Choisissez des appareils électroménagers économes en énergie, tels que des réfrigérateurs et des lave-linge de classe énergétique A+++. Cela vous permettra de réduire votre consommation d'électrici réduire votre consommation d'électricité.
-
-En ce qui concerne les aides financières disponibles, vous pouvez envisager les options suivantes :
-
-1. Crédit d'impôt : Vous pourriez être éligible à un crédit d'impôt pour la transition énergétique (CITE) pour certaines dépenses liées à l'amélioration de l'efficacité énergétique de votre logement. logement.
-
-2. Éco-prêt à taux zéro : Vous pouvez également demander un éco-prêt à taux zéro pour financer les travaux de rénovation énergétique de votre appartement.
-
-3. Aides de l'Agence nationale de l'habitat (ANAH) : L'ANAH propose des subventions pour les travaux de rénovation énergétique, en particulier pour les ménages à revenu modeste.
-
-4. Certificats d'économie d'énergie (CEE) : Vous pouvez bénéficier de primes ou de bons d'achat en réalisant des travaux d'économie d'énergie et en obtenant des certificats d'économie d'énergie.                                                                                                                                                                                        bles dans votre département.
-
-Il est recommandé de contacter les autorités locales, les agences de l'énergie ou les professionnels du secteur pour obtenir des informations plus précises sur les aides financières disponibles dans votre département."""
     task_status[session_key] = True
-    # TODO: replace with generated_response_string
-    task_message[session_key] = request1
-
+    task_message[session_key] = generated_response_string
 
 
 @app.route('/')
@@ -80,16 +75,14 @@ def init_chat():
     energy_type = request.form['energy_type']
     build_year = request.form['build_year']
     glazing_type = request.form['glazing_type']
-    dpe_objectif = DPE[DPE.index(dpe) - 1]
     data = {
-        "surface": surface,
-        "dpe": dpe,
-        "department": department,
-        "property_type": property_type,
-        "energy_type": energy_type,
-        "build_year": build_year,
-        "glazing_type": glazing_type,
-        "dpe_objectif": dpe_objectif,
+        "type_batiment_dpe": property_type,
+        "surface_habitable_logement": surface,
+        "annee_construction_dpe": build_year,
+        "type_vitrage": glazing_type,
+        "type_energie_chauffage": energy_type,
+        "code_departement_insee": department,
+        "classe_dpe": dpe,
     }
     print(data)
     session_key = 'task_done'  # Unique session key for task status
@@ -127,11 +120,8 @@ def renovaide_chat():
 
 @socketio.on('user_input')
 def handle_user_message(message):
-    # Logic to handle user message goes here...
-    print('received message: ' + message)
-    # Simulate response from ChatGPT-like bot
-    # TODO: Call bot here to get response
-    bot_response = "This is a response from the bot."
+    # Call chat gpt with user message and retrieve response
+    bot_response = fcts.get_bot_response(QUERY_ENGINE, message)
     emit('bot_message', bot_response)
 
 
