@@ -1,13 +1,13 @@
 from flask import Flask, render_template, session, redirect, url_for, jsonify
 from flask_socketio import SocketIO, emit
 import threading
-from fct import fcts
+# from fct import fcts
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' # For session management
 socketio = SocketIO(app)
 
-QUERY_ENGINE = fcts.init_server() # Init server bot backend
+# QUERY_ENGINE = fcts.init_server() # Init server bot backend
 
 # In-memory task completion flag and message - in production, use a database or cache
 task_status = {}
@@ -21,7 +21,30 @@ def query_reno_bot(session_key):
             + " dans le département 76. Elaborer une réponse avec les options d'aides financières disponibles."
         )
 
-        generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request)
+        # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, request)
+        generated_response_string = """ Pour identifier les économies d'énergie et passer de la classe DPE D à C pour votre appartement de 50 mètres carrés dans le département 76, vous pouvez envisager les mesures suivantes :
+
+1. Isolation : Assurez-vous que votre appartement est bien isolé, en particulier les murs, les fenêtres et le toit. Cela permettra de réduire les pertes de chaleur et de diminuer votre consommation d'énergie.
+
+2. Chauffage : Optez pour un système de chauffage plus efficace et économe en énergie, tel qu'une chaudière à granulés. Ce type de chauffage peut vous permettre de réaliser des économies significatives sur votre facture énergétique.
+
+3. Régulation de la température : Installez un thermostat programmable pour contrôler la température de votre appartement de manière plus précise et éviter les gaspillages d'énergie.       
+
+4. Éclairage : Remplacez les ampoules traditionnelles par des ampoules LED, qui consomment moins d'énergie et ont une durée de vie plus longue.
+
+5. Appareils électroménagers : Choisissez des appareils électroménagers économes en énergie, tels que des réfrigérateurs et des lave-linge de classe énergétique A+++. Cela vous permettra de réduire votre consommation d'électrici réduire votre consommation d'électricité.
+
+En ce qui concerne les aides financières disponibles, vous pouvez envisager les options suivantes :
+
+1. Crédit d'impôt : Vous pourriez être éligible à un crédit d'impôt pour la transition énergétique (CITE) pour certaines dépenses liées à l'amélioration de l'efficacité énergétique de votre logement. logement.
+
+2. Éco-prêt à taux zéro : Vous pouvez également demander un éco-prêt à taux zéro pour financer les travaux de rénovation énergétique de votre appartement.
+
+3. Aides de l'Agence nationale de l'habitat (ANAH) : L'ANAH propose des subventions pour les travaux de rénovation énergétique, en particulier pour les ménages à revenu modeste.
+
+4. Certificats d'économie d'énergie (CEE) : Vous pouvez bénéficier de primes ou de bons d'achat en réalisant des travaux d'économie d'énergie et en obtenant des certificats d'économie d'énergie.                                                                                                                                                                                        bles dans votre département.
+
+Il est recommandé de contacter les autorités locales, les agences de l'énergie ou les professionnels du secteur pour obtenir des informations plus précises sur les aides financières disponibles dans votre département."""
         task_status[session_key] = True
         task_message[session_key] = generated_response_string
 
@@ -65,23 +88,28 @@ def renovaide_chat():
     return render_template('chat.html', initial_message=initial_message)
 
 
-@socketio.on('user_message')
+@socketio.on('user_input')
 def handle_user_message(message):
     # Logic to handle user message goes here...
     print('received message: ' + message)
     # Simulate response from ChatGPT-like bot
+    # TODO: Call bot here to get response
     bot_response = "This is a response from the bot."
     emit('bot_message', bot_response)
 
 
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+@socketio.on('user_connection')
+def handle_user_connection(json):
+    print('received user connection json: ' + str(json))
+
 
 if __name__ == '__main__':
+    print("Initialize server")
     # Use the development server if running in debug mode
     if app.debug:
+        print("Debug mode start")
         socketio.run(app)
     else:
         # Use an ASGI server such as eventlet or gevent in production
+        print("Prod mode start")
         socketio.run(app, host='0.0.0.0', port=5000)

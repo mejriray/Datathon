@@ -32,8 +32,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 # Set API KEY
-OPENAI_API_KEY = os.environ["OPEN_API_KEY"]
-# Replace 'your-api-key' with your actual OpenAI API key
+OPENAI_API_KEY = "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"
 openai.api_key = OPENAI_API_KEY
 
 def init_server():
