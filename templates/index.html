@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+    <meta>
     <title>RenovAIde</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
-        <h1>Bienvenue dans RenovAIde</h1>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="100" height="70">
     </header>
-
-
-    <nav>
-        <ul>
-            <li><a href="/">Root</a></li>
-        </ul>
-    </nav>
 
     <main>
         <h2>Page d'accueil</h2>
@@ -47,13 +40,26 @@
         <option value="14">Calvados : 14</option>
     </select>
 
-    <label for="postal_code">Code Postal</label>
-    <input type="text" id="postal_code" name="postal_code"><br>
-
     <label for="property_type">Type de bien</label>
     <select id="property_type" name="property_type">
         <option value="Maison">Maison</option>
         <option value="Appartement">Appartement</option>
+    </select><br>
+
+    <label for="build_year">Année de construction</label>
+    <input type="number" id="build_year" name="build_year" required><br>
+
+    <label for="energy_type">Type d'énergie</label>
+    <select id="energy_type" name="energy_type">
+        <option value="Elecrique">Elecrique</option>
+        <option value="Gaz">Gaz</option>
+        <option value="ElecriqueGaz">Electrique & Gaz</option>
+    </select><br>
+
+    <select id="glazing_type" name="glazing_type">
+        <option value="Simple">Simple vitrage</option>
+        <option value="Double">Double vitrage</option>
+        <option value="Triple">Triple vitrage</option>
     </select><br>
 
     <button type="submit">Calculer les recommandations de rénovation</button>
@@ -61,14 +67,8 @@
 
 </form>
 <!-- ... -->
-        <h3>Recommandations de rénovation</h3>
-        <div id="recommendations">
-            Les recommandations du chatbot seront ici ^_^
-        </div>
-    </main>
-
     <footer>
-        <p>&copy; Equipe Data Devolis SREHDD</p>
+        <p>&copy; Equipe Data Devolis RenovAIde</p>
     </footer>
 </body>
 </html>

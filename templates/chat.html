@@ -5,10 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <title>RenovAIde</title>
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="300" height="200">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <style type="text/css">
         .fixed-panel {
             min-height: 600px;
@@ -95,9 +97,9 @@
 <body>
     <div class="container background-color: rgb(255,20,255);">
         <div class="row">
-            <h3 class="text-center"><font color="white"><strong>Renov</font>
+            <!--<h3 class="text-center"><font color="white"><strong>Renov</font>
                 <font color="yellow">AI</font><font color="white"> de</strong></font>
-            </h3>
+            </h3> -->
             <div class="col-md-6">
                 <div id="chatPanel" class="panel panel-info">
                     <div class="panel-heading">
@@ -128,6 +130,7 @@
                 <br><br>
                 <p>
                     <font color="white">A plot or something</font>
+                    <canvas id="myChart" width="400" height="200"></canvas>
                 </p>
             </div>
         </div>
@@ -179,7 +182,36 @@
             }
             $('#messages').append(messageElement);
         }
-    </script>
+
+    // Sample data for the bar chart
+    var data = {
+        labels: ['January', 'February', 'March', 'April', 'May'],
+        datasets: [
+            {
+                label: 'Energy Consumption',
+                data: [12, 19, 3, 5, 2],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }
+        ]
+    };
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
 </body>
 
 </html>

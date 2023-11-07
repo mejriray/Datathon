@@ -1,12 +1,15 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
     margin: 0;
     padding: 0;
 }
-
+.header-image {
+    max-width: 50%;
+    height: 10px !important; 
+}
 header {
-    background-color: #001f3f;
+    background: linear-gradient(135deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
     color: #fff;
     text-align: center;
     padding: 20px;

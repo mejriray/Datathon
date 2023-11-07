@@ -113,4 +113,3 @@ def init_server():
 def get_bot_response(query_engine, request):
     response = query_engine.query(request)
     return str(response)
-
