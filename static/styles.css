@@ -57,3 +57,16 @@ button {
 button:hover {
     background-color: #003f7f;
 }
+footer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    text-align: right;
+    color: #fff;
+}
+
+footer p {
+    float: left; 
+    padding-right: 10px;
+}

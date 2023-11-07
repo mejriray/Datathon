@@ -18,7 +18,6 @@ task_status = {}
 task_message = {}
 
 
-
 def query_reno_bot(session_key, data):
             
     request1 = (
