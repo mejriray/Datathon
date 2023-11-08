@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>RenovAIde</title>
-    <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="LOGO" width="300" height="200">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="300" height="200">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
             color: white;
             overflow-y:auto;
         }
-    
+        
         .media-list {
             overflow-y:auto;
             clear: both;
@@ -30,7 +30,7 @@
             word-break: normal;
             line-break: strict;
         }
-    
+        
         .panel {
             margin-bottom: 20px;
             background-color: #fff;
@@ -39,17 +39,17 @@
             -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
             box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
         }
-    
+        
         .panel-info {
             border-color: #0c2735;
         }
-    
+        
         .panel-info>.panel-heading {
             color: white;
             background-color: #0c2735;
             border-color: #0c2735;
         }
-    
+        
         .panel-footer {
             padding: 10px 15px;
             background-color: #0c2735;
@@ -79,7 +79,7 @@
             background-color: #0c2735b8;
             border-top: 1px solid #0c2735b8;
         }
-    
+        
         body {
             background: rgb(96, 143, 149);
             /* Old browsers */
@@ -96,8 +96,6 @@
 </head>
 
 <body>
-
-
     <div class="container background-color: rgb(255,20,255);">
         <div class="row">
             <!--<h3 class="text-center"><font color="white"><strong>Renov</font>
@@ -116,7 +114,7 @@
                         <form method="post" id="chatbot-form">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Enter Message" name="messageText"
-                                    id="user_input" autofocus />
+                                id="user_input" autofocus />
                                 <span class="input-group-btn">
                                     <button class="btn btn-info" type="button" id="chatbot-form-btn" onclick="sendMessage()">Send</button>
                                 </span>
@@ -133,32 +131,32 @@
                 <br><br>
                 <p>
                     <font color="white">A plot or something</font>
-                    <div>{{ plot_div | safe }}</div>
                 </p>
+                <div>{{ plot_div | safe }}</div>
             </div>
         </div>
     </div>
     <script type="text/javascript">
         // Correctly initialize the Socket.IO client
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-
+        
         socket.on('connect', function () {
             // Emit a message upon connection
             socket.emit('user_connection', { data: 'User has connected!' });
-
+            
             // Display the initial message if there is one
             var initialMessage = "{{ initial_message|safe }}";
             if (initialMessage) {
                 addMessage("RenovAI", initialMessage, true);
             }
         });
-
+        
         socket.on('bot_message', function (msg) {
             // Append the bot's message to the message list.
             addMessage("RenovAI", msg, true);
             $("user_input").removeAttr('disabled');
         });
-
+        
         function sendMessage() {
             var messageText = $('#user_input').val();
             addMessage("Vous", messageText);
@@ -167,7 +165,7 @@
             $("user_input").attr('disabled', 'disabled');
             return false;
         }
-
+        
         // Update the addMessage function to handle HTML content if needed
         function addMessage(sender, message, isHtml) {
             var displayMessage = sender + " : " + message;
@@ -177,16 +175,14 @@
             } else {
                 css_class = '"user-message"';
             }
-            list_elem = '<li class=' + css_class + '>'
-            if (isHtml) {
-                var messageElement = $(list_elem).html(displayMessage);
-            } else {
-                var messageElement = $(list_elem).text(displayMessage);
+            list_elem = '<li class=' + css_class + '>';
+                if (isHtml) {
+                    var messageElement = $(list_elem).html(displayMessage);
+                } else {
+                    var messageElement = $(list_elem).text(displayMessage);
+                }
+                $('#messages').append(messageElement);
             }
-            $('#messages').append(messageElement);
-        }
-</script>
-
+    </script>
 </body>
-
 </html>

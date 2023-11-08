@@ -6,30 +6,38 @@ import plotly.express as px
 from fct import fcts
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key' # For session management
+app.config['SECRET_KEY'] = 'your_secret_key'  # For session management
 socketio = SocketIO(app)
 
 # Init server bot backend:
 # Llama-index query engine to prompt queries to a specialized ChatGPT
 # Database is a pandas dataframe containing average energy consumtions for housing in Normandie
-QUERY_ENGINE, DATABASE = fcts.init_server() 
+QUERY_ENGINE, DATABASE = fcts.init_server()
 
 # In-memory task completion flag and message - in production, use a database or cache
 task_status = {}
 task_message = {}
+task_data = {}
 
-# TODO: move this to the right place
-# Convert the Plotly figure to HTML
-fig_classe_dpe = px.bar(
-    DATABASE, x='classe_dpe', title='Répartition des classes DPE')
 
-fig_classe_dpe.update_layout(
-    {
-        "plot_bgcolor": "rgba(0, 0, 0, 0)",
-        "paper_bgcolor": "rgba(0, 0, 0, 0)",
+def get_info():
+    surface = int(request.form['surface'])
+    dpe = request.form['dpe']
+    department = request.form['department']
+    property_type = request.form['property_type'].lower()
+    energy_type = request.form['energy_type'].lower()
+    build_year = int(request.form['build_year'])
+    glazing_type = request.form['glazing_type'].lower()
+    data = {
+        "type_batiment_dpe": property_type,
+        "surface_habitable_logement": surface,
+        "annee_construction_dpe": build_year,
+        "type_vitrage": glazing_type,
+        "type_energie_chauffage": energy_type,
+        "code_departement_insee": department,
+        "classe_dpe": dpe,
     }
-)
-plot_div = fig_classe_dpe.to_html( full_html=False)
+    return data
 
 def query_reno_bot(session_key, data):
     user_request = (
@@ -61,13 +69,14 @@ def query_reno_bot(session_key, data):
     print("User request:")
     print(user_request)
 
-    generated_response_string = fcts.get_bot_response(QUERY_ENGINE, user_request)
+    # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, user_request)
+    generated_response_string = "bot wonderfull response<br>super réponse du bot"
     print("generated_response_string:")
     print(generated_response_string)
 
     task_status[session_key] = True
     task_message[session_key] = generated_response_string
-
+    task_data[session_key] = data
 
 @app.route('/')
 def index():
@@ -76,27 +85,13 @@ def index():
 
 @app.route("/init_chat", methods=['POST'])
 def init_chat():
-    surface = int(request.form['surface'])
-    dpe = request.form['dpe']
-    department = request.form['department']
-    property_type = request.form['property_type']
-    energy_type = request.form['energy_type']
-    build_year = request.form['build_year']
-    glazing_type = request.form['glazing_type']
-    data = {
-        "type_batiment_dpe": property_type,
-        "surface_habitable_logement": surface,
-        "annee_construction_dpe": build_year,
-        "type_vitrage": glazing_type,
-        "type_energie_chauffage": energy_type,
-        "code_departement_insee": department,
-        "classe_dpe": dpe,
-    }
+    data = get_info()
     print(data)
     session_key = 'task_done'  # Unique session key for task status
     session[session_key] = False
     task_status[session_key] = False
     task_message[session_key] = ""
+    task_data[session_key] = {}
     # Start long-running task in a separate thread
     threading.Thread(target=query_reno_bot, args=(session_key, data)).start()
     return redirect(url_for('loading'))
@@ -105,6 +100,7 @@ def init_chat():
 @app.route('/loading')
 def loading():
     # Render loading page
+    plot_div = fcts.plot_dpe_stats(DATABASE)
     return render_template('loading.html', plot_div=plot_div)
 
 
@@ -120,16 +116,16 @@ def check_status():
 def renovaide_chat():
     session_key = 'task_done'
     initial_message = task_message.get(session_key, "")
+    data = task_data.get(session_key, "")
     initial_message = initial_message.strip().replace("\n", "<br>")
-    print("INITIAL MESSAGE:\n",initial_message)
-    
+    plot_div = fcts.plot_bilan(DATABASE, data)
     return render_template('chat.html', initial_message=initial_message, plot_div=plot_div)
 
 
 @socketio.on('user_input')
 def handle_user_message(message):
     # Call chat gpt with user message and retrieve response
-    bot_response = fcts.get_bot_response(QUERY_ENGINE, message)
+    bot_response = "bot response" # fcts.get_bot_response(QUERY_ENGINE, message)
     emit('bot_message', bot_response)
 
 
