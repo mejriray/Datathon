@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>RenovAIde</title>
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="300" height="200">
+    <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="LOGO" width="300" height="200">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -97,7 +97,6 @@
 
 <body>
 
-    <div>{{ plot_div | safe }}</div>
 
     <div class="container background-color: rgb(255,20,255);">
         <div class="row">
@@ -134,7 +133,7 @@
                 <br><br>
                 <p>
                     <font color="white">A plot or something</font>
-                    <canvas id="myChart" width="400" height="200"></canvas>
+                    <div>{{ plot_div | safe }}</div>
                 </p>
             </div>
         </div>
@@ -186,34 +185,6 @@
             }
             $('#messages').append(messageElement);
         }
-
-    // Sample data for the bar chart
-    var data = {
-        labels: ['January', 'February', 'March', 'April', 'May'],
-        datasets: [
-            {
-                label: 'Energy Consumption',
-                data: [12, 19, 3, 5, 2],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }
-        ]
-    };
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: data,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
 </script>
 
 </body>
