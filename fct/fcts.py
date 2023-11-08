@@ -51,7 +51,7 @@ def init_server():
 
     # Load database as pandas
     df = pd.read_parquet("data/database_dpe.parquet")
-    
+
     return query_engine, df
 
 def get_bot_response(query_engine, request):
@@ -98,11 +98,13 @@ def plot_dpe_stats(df):
     # Convert the Plotly figure to HTML
     fig_classe_dpe = px.bar(
         df, x='classe_dpe', title='Répartition des classes DPE')
-
+    fig_classe_dpe.update_xaxes(showgrid=False, color="white")
+    fig_classe_dpe.update_yaxes(showgrid=False, color="white")
     fig_classe_dpe.update_layout(
         {
             "plot_bgcolor": "rgba(0, 0, 0, 0)",
             "paper_bgcolor": "rgba(0, 0, 0, 0)",
+            "title_font_color": "white",
         }
     )
     plot_div = fig_classe_dpe.to_html(full_html=False)
