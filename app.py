@@ -17,32 +17,19 @@ QUERY_ENGINE, DATABASE = fcts.init_server()
 # In-memory task completion flag and message - in production, use a database or cache
 task_status = {}
 task_message = {}
-task_data = {}
 
 # TODO: move this to the right place
 # Convert the Plotly figure to HTML
-#fig_surface = px.histogram(DATABASE, x='surface_habitable_logement', nbins=50, title='Distribution de la surface habitable')
-#plot_div = fig_surface.to_html(full_html=False)
-df = pd.read_parquet("dfs/database_dpe.parquet")
+fig_classe_dpe = px.bar(
+    DATABASE, x='classe_dpe', title='Répartition des classes DPE')
 
-def get_info():
-    surface = int(request.form['surface'])
-    dpe = request.form['dpe']
-    department = request.form['department']
-    property_type = request.form['property_type']
-    energy_type = request.form['energy_type']
-    build_year = request.form['build_year']
-    glazing_type = request.form['glazing_type']
-    data = {
-        "type_batiment_dpe": property_type,
-        "surface_habitable_logement": surface,
-        "annee_construction_dpe": build_year,
-        "type_vitrage": glazing_type,
-        "type_energie_chauffage": energy_type,
-        "code_departement_insee": department,
-        "classe_dpe": dpe,
+fig_classe_dpe.update_layout(
+    {
+        "plot_bgcolor": "rgba(0, 0, 0, 0)",
+        "paper_bgcolor": "rgba(0, 0, 0, 0)",
     }
-    return data
+)
+plot_div = fig_classe_dpe.to_html( full_html=False)
 
 def query_reno_bot(session_key, data):
     user_request = (
@@ -74,14 +61,12 @@ def query_reno_bot(session_key, data):
     print("User request:")
     print(user_request)
 
-    # generated_response_string = fcts.get_bot_response(QUERY_ENGINE, user_request)
-    generated_response_string = "tmp"
+    generated_response_string = fcts.get_bot_response(QUERY_ENGINE, user_request)
     print("generated_response_string:")
     print(generated_response_string)
 
     task_status[session_key] = True
     task_message[session_key] = generated_response_string
-    task_data[session_key] = data
 
 
 @app.route('/')
@@ -91,13 +76,27 @@ def index():
 
 @app.route("/init_chat", methods=['POST'])
 def init_chat():
-    data = get_info()
+    surface = int(request.form['surface'])
+    dpe = request.form['dpe']
+    department = request.form['department']
+    property_type = request.form['property_type']
+    energy_type = request.form['energy_type']
+    build_year = request.form['build_year']
+    glazing_type = request.form['glazing_type']
+    data = {
+        "type_batiment_dpe": property_type,
+        "surface_habitable_logement": surface,
+        "annee_construction_dpe": build_year,
+        "type_vitrage": glazing_type,
+        "type_energie_chauffage": energy_type,
+        "code_departement_insee": department,
+        "classe_dpe": dpe,
+    }
     print(data)
     session_key = 'task_done'  # Unique session key for task status
     session[session_key] = False
     task_status[session_key] = False
     task_message[session_key] = ""
-    task_data[session_key] = {}
     # Start long-running task in a separate thread
     threading.Thread(target=query_reno_bot, args=(session_key, data)).start()
     return redirect(url_for('loading'))
@@ -106,7 +105,7 @@ def init_chat():
 @app.route('/loading')
 def loading():
     # Render loading page
-    return render_template('loading.html')
+    return render_template('loading.html', plot_div=plot_div)
 
 
 @app.route('/check_status')
@@ -121,12 +120,9 @@ def check_status():
 def renovaide_chat():
     session_key = 'task_done'
     initial_message = task_message.get(session_key, "")
-    data = task_data.get(session_key, "")
     initial_message = initial_message.strip().replace("\n", "<br>")
-    print("INITIAL MESSAGE:\n", initial_message)
-    print("data1")
-    print(data)
-    plot_div = fcts.plot_bilan(df, data)
+    print("INITIAL MESSAGE:\n",initial_message)
+    
     return render_template('chat.html', initial_message=initial_message, plot_div=plot_div)
 
 
