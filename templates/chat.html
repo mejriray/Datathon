@@ -124,14 +124,16 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <br><br><br>
+                <h2>Votre bilan consommation énergétique:</h2>
+                <br><br>
                 <p>
-                    <font color="white">Aujourd'hui vous êtes en DPE {{ actual_dpe }} 
-                        et vous payez {{ actual_cost }}€. Si vous passez en DPE {{ objectif_dpe }}
-                        vous payerez {{ objectif_cost }}€ 
+                    <font color="white">Aujourd'hui vous êtes en catégorie<font color="yellow"> {{ actual_dpe }} </font>de DPE. <br><br>
+                        Les logements similaires de cette région de cette catégories ont une facture annuelle d'environ <font color="yellow">{{ actual_cost }} €</font>.<br><br>
+                        Les logements de la classe <font color="yellow">{{ objectif_dpe }}</font> payent en moyenne <font color="yellow">{{ objectif_cost }} €</font> par an. <br><br>
+                        Ce qui équivaut à une réduction de <font color="yellow">{{ reduction_per }} %</font>.
                     </font>
                 </p>
-                <br><br>
+                <br>
                 <div>{{ plot_div | safe }}</div>
             </div>
         </div>

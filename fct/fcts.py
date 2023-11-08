@@ -86,12 +86,15 @@ def plot_bilan(df, data):
         "classe_dpe").conso_energies_primaires_m2.mean().reset_index().sort_values(by='classe_dpe', ascending=False)
 
     fig = px.bar(dfg, x="conso_energies_primaires_m2",
-                 y="classe_dpe", title="Concommations d'énergies primaires au m² par classe DPE",
-                   orientation='h', template='plotly_dark')
+                 y="classe_dpe", title="Concommations d'énergies primaires moyennes au m² par classe de DPE",
+                   orientation='h')
+    fig.update_xaxes(showgrid=False, color="white")
+    fig.update_yaxes(showgrid=False, color="white")
     fig.update_layout(
         {
             "plot_bgcolor": "rgba(0, 0, 0, 0)",
             "paper_bgcolor": "rgba(0, 0, 0, 0)",
+            "title_font_color": "white",
         }
     )
     plot_div = fig.to_html(full_html=False)
@@ -105,13 +108,14 @@ def plot_bilan(df, data):
     price = 0.2276 #prix annuel par metre carre (énergivore)
     actual_cost = price * actual_conso * surface
     objectif_cost = price * objectif_conso * surface
-    return plot_div, actual_dpe, objectif_dpe, actual_cost, objectif_cost
+    reduction_per = 100 - (objectif_cost/actual_cost * 100)
+    return plot_div, actual_dpe, objectif_dpe, actual_cost, objectif_cost, reduction_per
 
 
 def plot_dpe_stats(df):
     # Convert the Plotly figure to HTML
     fig_classe_dpe = px.bar(
-        df, x='classe_dpe', title='Répartition des classes DPE')
+        df, x='classe_dpe', title='Répartition des classes de DPE')
     fig_classe_dpe.update_xaxes(showgrid=False, color="white")
     fig_classe_dpe.update_yaxes(showgrid=False, color="white")
     fig_classe_dpe.update_layout(
