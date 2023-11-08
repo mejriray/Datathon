@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>RenovAIde</title>
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LOGO" width="300" height="200">
+    <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="LOGO" width="300" height="200">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
@@ -126,12 +126,12 @@
             <div class="col-md-6">
                 <br><br><br>
                 <p>
-                    <font color="white">Some info about energy savings</font>
+                    <font color="white">Aujourd'hui vous êtes en DPE {{ actual_dpe }} 
+                        et vous payez {{ actual_cost }}€. Si vous passez en DPE {{ objectif_dpe }}
+                        vous payerez {{ objectif_cost }}€ 
+                    </font>
                 </p>
                 <br><br>
-                <p>
-                    <font color="white">A plot or something</font>
-                </p>
                 <div>{{ plot_div | safe }}</div>
             </div>
         </div>

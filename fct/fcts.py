@@ -20,12 +20,14 @@ from llama_index.llms import OpenAI
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
+list_dpe = ["A", "B", "C", "D", "E", "F", "G"]
+
 
 def parse_credentials():
-    with open("credentials.yml","r") as f:
-        credentials = yaml.load(f)
-    openai_api_key = credentials.get("open_api_key")
-    return openai_api_key
+   # with open("credentials.yml","r") as f:
+       # credentials = yaml.load(f)
+   # openai_api_key = credentials.get("open_api_key")
+    return "openai_api_key"
 
 
 # Set API KEY
@@ -81,10 +83,11 @@ def plot_bilan(df, data):
         else:
             df_filtered = df_filtered_new
     dfg = df_filtered.groupby(
-        "classe_dpe").conso_energies_primaires_m2.mean().reset_index()
+        "classe_dpe").conso_energies_primaires_m2.mean().reset_index().sort_values(by='classe_dpe', ascending=False)
 
     fig = px.bar(dfg, x="conso_energies_primaires_m2",
-                 y="classe_dpe", title="Concommations d'énergies primaires au m² par classe DPE", orientation='h')
+                 y="classe_dpe", title="Concommations d'énergies primaires au m² par classe DPE",
+                   orientation='h', template='plotly_dark')
     fig.update_layout(
         {
             "plot_bgcolor": "rgba(0, 0, 0, 0)",
@@ -92,7 +95,18 @@ def plot_bilan(df, data):
         }
     )
     plot_div = fig.to_html(full_html=False)
-    return plot_div
+
+    #texte de bilan
+    actual_dpe = data.get("classe_dpe")
+    objectif_dpe = list_dpe[list_dpe.index(actual_dpe) - 1]
+    surface = data["surface_habitable_logement"]
+    actual_conso = dfg[dfg["classe_dpe"] == actual_dpe].conso_energies_primaires_m2.mean()
+    objectif_conso = dfg[dfg["classe_dpe"] == objectif_dpe].conso_energies_primaires_m2.mean()
+    price = 0.2276 #prix annuel par metre carre (énergivore)
+    actual_cost = price * actual_conso * surface
+    objectif_cost = price * objectif_conso * surface
+    return plot_div, actual_dpe, objectif_dpe, actual_cost, objectif_cost
+
 
 def plot_dpe_stats(df):
     # Convert the Plotly figure to HTML

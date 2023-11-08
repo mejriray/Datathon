@@ -118,8 +118,10 @@ def renovaide_chat():
     initial_message = task_message.get(session_key, "")
     data = task_data.get(session_key, "")
     initial_message = initial_message.strip().replace("\n", "<br>")
-    plot_div = fcts.plot_bilan(DATABASE, data)
-    return render_template('chat.html', initial_message=initial_message, plot_div=plot_div)
+    plot_div, actual_dpe, objectif_dpe, actual_cost, objectif_cost = fcts.plot_bilan(DATABASE, data)
+    return render_template('chat.html', initial_message=initial_message, plot_div=plot_div, 
+                        actual_dpe=actual_dpe, objectif_dpe=objectif_dpe, 
+                        actual_cost=int(actual_cost), objectif_cost=int(objectif_cost))
 
 
 @socketio.on('user_input')
